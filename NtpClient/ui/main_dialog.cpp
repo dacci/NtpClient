@@ -23,15 +23,17 @@
 #include "ui/main_dialog.h"
 
 #include "app/ntp_client.h"
-#include "misc/ntp.h"
 #include "misc/ntp_util.h"
 
-MainDialog::MainDialog() : event_(::CreateEvent(NULL, TRUE, FALSE, NULL)) {
+MainDialog::MainDialog()
+    : event_(::CreateEvent(NULL, TRUE, FALSE, NULL)), response_() {
 }
 
 MainDialog::~MainDialog() {
   ::CloseHandle(event_);
   event_ = NULL;
+
+  delete response_;
 }
 
 BOOL MainDialog::PreTranslateMessage(MSG* message) {
@@ -39,6 +41,8 @@ BOOL MainDialog::PreTranslateMessage(MSG* message) {
 }
 
 BOOL MainDialog::OnInitDialog(CWindow focus, LPARAM init_param) {
+  SetIcon(::AtlLoadIcon(IDD_MAIN));
+
   DoDataExchange(DDX_LOAD);
   DlgResize_Init(true);
 
@@ -76,6 +80,18 @@ void MainDialog::OnDestroy() {
   ::PostQuitMessage(0);
 }
 
+LRESULT MainDialog::OnResultDoubleClicked(NMHDR* header) {
+  NMITEMACTIVATE* notify = reinterpret_cast<NMITEMACTIVATE*>(header);
+
+  if (response_ != NULL && response_->stratum > 1 && notify->iItem == 8) {
+    CString reference_id;
+    result_.GetItemText(8, 1, reference_id);
+    address_.SetWindowText(reference_id);
+  }
+
+  return 0;
+}
+
 void MainDialog::OnOK(UINT notify_code, int id, CWindow control) {
   REQUEST_INFO* request_info = new REQUEST_INFO;
   HRESULT result = NetAddr_GetAddress(address_,
@@ -90,83 +106,82 @@ void MainDialog::OnOK(UINT notify_code, int id, CWindow control) {
   request_info->event = event_;
 
   if (::TrySubmitThreadpoolCallback(SimpleCallback, request_info, NULL))
-    ok_.EnableWindow(FALSE);
+    EnableWindow(FALSE);
   else
     delete request_info;
 }
 
 void MainDialog::OnYes(UINT notify_code, int id, void* context) {
-  ok_.EnableWindow();
+  EnableWindow();
 
-  NTP_PACKET* response = static_cast<NTP_PACKET*>(context);
+  delete response_;
+  response_ = static_cast<NTP_PACKET*>(context);
 
-  response->root_delay = ::_byteswap_ulong(response->root_delay);
-  response->root_dispersion = ::_byteswap_ulong(response->root_dispersion);
-  response->reference_timestamp.seconds =
-      ::_byteswap_ulong(response->reference_timestamp.seconds);
-  response->reference_timestamp.fraction =
-      ::_byteswap_ulong(response->reference_timestamp.fraction);
-  response->origin_timestamp.seconds =
-      ::_byteswap_ulong(response->origin_timestamp.seconds);
-  response->origin_timestamp.fraction =
-      ::_byteswap_ulong(response->origin_timestamp.fraction);
-  response->receive_timestamp.seconds =
-      ::_byteswap_ulong(response->receive_timestamp.seconds);
-  response->receive_timestamp.fraction =
-      ::_byteswap_ulong(response->receive_timestamp.fraction);
-  response->transmit_timestamp.seconds =
-      ::_byteswap_ulong(response->transmit_timestamp.seconds);
-  response->transmit_timestamp.fraction =
-      ::_byteswap_ulong(response->transmit_timestamp.fraction);
+  response_->root_delay = ::_byteswap_ulong(response_->root_delay);
+  response_->root_dispersion = ::_byteswap_ulong(response_->root_dispersion);
+  response_->reference_timestamp.seconds =
+      ::_byteswap_ulong(response_->reference_timestamp.seconds);
+  response_->reference_timestamp.fraction =
+      ::_byteswap_ulong(response_->reference_timestamp.fraction);
+  response_->origin_timestamp.seconds =
+      ::_byteswap_ulong(response_->origin_timestamp.seconds);
+  response_->origin_timestamp.fraction =
+      ::_byteswap_ulong(response_->origin_timestamp.fraction);
+  response_->receive_timestamp.seconds =
+      ::_byteswap_ulong(response_->receive_timestamp.seconds);
+  response_->receive_timestamp.fraction =
+      ::_byteswap_ulong(response_->receive_timestamp.fraction);
+  response_->transmit_timestamp.seconds =
+      ::_byteswap_ulong(response_->transmit_timestamp.seconds);
+  response_->transmit_timestamp.fraction =
+      ::_byteswap_ulong(response_->transmit_timestamp.fraction);
 
   CString item;
 
-  item.Format(L"%d", response->leap);
+  item.Format(L"%d", response_->leap);
   result_.SetItemText(0, 1, item);
 
-  item.Format(L"%d", response->mode);
+  item.Format(L"%d", response_->mode);
   result_.SetItemText(1, 1, item);
 
-  item.Format(L"%d", response->version);
+  item.Format(L"%d", response_->version);
   result_.SetItemText(2, 1, item);
 
-  item.Format(L"%d", response->stratum);
+  item.Format(L"%d", response_->stratum);
   result_.SetItemText(3, 1, item);
 
-  item.Format(L"%d", response->poll);
+  item.Format(L"%d", response_->poll);
   result_.SetItemText(4, 1, item);
 
-  item.Format(L"%d", response->precision);
+  item.Format(L"%d", response_->precision);
   result_.SetItemText(5, 1, item);
 
-  item.Format(L"%lf", response->root_delay / 65536.0);
+  item.Format(L"%lf", response_->root_delay / 65536.0);
   result_.SetItemText(6, 1, item);
 
-  item.Format(L"%lf", response->root_dispersion / 65536.0);
+  item.Format(L"%lf", response_->root_dispersion / 65536.0);
   result_.SetItemText(7, 1, item);
 
-  ::FormatNtpReferenceId(response->reference_id, &item);
+  ::FormatNtpReferenceId(response_->stratum, response_->reference_id, &item);
   result_.SetItemText(8, 1, item);
 
-  ::FormatNtpTimestamp(response->reference_timestamp, &item);
+  ::FormatNtpTimestamp(response_->reference_timestamp, &item);
   result_.SetItemText(9, 1, item);
 
-  ::FormatNtpTimestamp(response->origin_timestamp, &item);
+  ::FormatNtpTimestamp(response_->origin_timestamp, &item);
   result_.SetItemText(10, 1, item);
 
-  ::FormatNtpTimestamp(response->receive_timestamp, &item);
+  ::FormatNtpTimestamp(response_->receive_timestamp, &item);
   result_.SetItemText(11, 1, item);
 
-  ::FormatNtpTimestamp(response->transmit_timestamp, &item);
+  ::FormatNtpTimestamp(response_->transmit_timestamp, &item);
   result_.SetItemText(12, 1, item);
 
   result_.SetColumnWidth(1, LVSCW_AUTOSIZE);
-
-  delete response;
 }
 
 void MainDialog::OnNo(UINT notify_code, int id, void* context) {
-  ok_.EnableWindow();
+  EnableWindow();
 
   for (int i = 0, l = result_.GetItemCount(); i < l; ++i)
     result_.SetItemText(i, 1, NULL);

@@ -33,6 +33,7 @@
 #include <atldlgs.h>
 #include <atlframe.h>
 
+#include "misc/ntp.h"
 #include "res/resource.h"
 
 class MainDialog
@@ -49,6 +50,8 @@ class MainDialog
   BEGIN_MSG_MAP(MainDialog)
     MSG_WM_INITDIALOG(OnInitDialog)
     MSG_WM_DESTROY(OnDestroy)
+
+    NOTIFY_HANDLER_EX(IDC_RESULT, NM_DBLCLK, OnResultDoubleClicked)
 
     COMMAND_ID_HANDLER_EX(IDOK, OnOK)
     COMMAND_ID_HANDLER_EX(IDYES, OnYes)
@@ -75,6 +78,9 @@ class MainDialog
  private:
   BOOL OnInitDialog(CWindow focus, LPARAM init_param);
   void OnDestroy();
+
+  LRESULT OnResultDoubleClicked(NMHDR* header);
+
   void OnOK(UINT notify_code, int id, CWindow control);
   void OnYes(UINT notify_code, int id, void* context);
   void OnNo(UINT notify_code, int id, void* context);
@@ -84,6 +90,8 @@ class MainDialog
   CWindow address_;
   CButton ok_;
   CListViewCtrl result_;
+
+  NTP_PACKET* response_;
 };
 
 #endif  // NTPCLIENT_UI_MAIN_DIALOG_H_

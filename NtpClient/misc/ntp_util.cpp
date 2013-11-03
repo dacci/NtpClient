@@ -95,31 +95,15 @@ void FormatNtpTimestamp(const NTP_TIMESTAMP& timestamp, CString* result) {
                  fraction);
 }
 
-void FormatNtpReferenceId(const uint8_t* ref_id, CString* result) {
-  bool printable = true;
-  bool null_id = true;
-  for (int i = 0; i < 4; ++i) {
-    if (ref_id[i] != 0) {
-      null_id = false;
-      if (!::isprint(ref_id[i])) {
-        printable = false;
-        break;
-      }
-    }
-  }
-
-  if (null_id) {
-    *result = L"(null)";
-    return;
-  }
-
+void FormatNtpReferenceId(int stratum, const uint8_t* ref_id, CString* result) {
   result->Empty();
 
-  for (int i = 0; i < 4; ++i) {
-    if (printable) {
+  if (stratum == 1) {
+    for (int i = 0; i < 4; ++i)
       result->AppendChar(ref_id[i]);
-    } else {
-      if (i)
+  } else {
+    for (int i = 0; i < 4; ++i) {
+      if (i > 0)
         result->AppendChar(L'.');
       result->AppendFormat(L"%u", ref_id[i]);
     }

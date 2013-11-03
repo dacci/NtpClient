@@ -32,6 +32,6 @@
 
 void ConvertNtpTimestamp(const NTP_TIMESTAMP& timestamp, tm* time);
 void FormatNtpTimestamp(const NTP_TIMESTAMP& timestamp, CString* result);
-void FormatNtpReferenceId(const uint8_t* ref_id, CString* result);
+void FormatNtpReferenceId(int stratum, const uint8_t* ref_id, CString* result);
 
 #endif  // NTPCLIENT_MISC_NTP_UTIL_H_

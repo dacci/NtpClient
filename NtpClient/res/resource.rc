@@ -60,14 +60,14 @@ IDD_MAIN                ICON                    "clock.ico"
 //
 
 IDD_MAIN DIALOGEX 0, 0, 245, 188
-STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "NTP クライアント"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "NTP サーバー (&S):",IDC_STATIC,7,10,56,8
     CONTROL         "",IDC_ADDRESS,"msctls_netaddress",ES_AUTOHSCROLL | WS_TABSTOP,70,8,127,12,WS_EX_CLIENTEDGE
     DEFPUSHBUTTON   "送信",IDOK,204,7,34,14
-    CONTROL         "",IDC_RESULT,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,28,231,153,WS_EX_CLIENTEDGE
+    CONTROL         "",IDC_RESULT,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,28,231,153,WS_EX_CLIENTEDGE
 END
 
 
@@ -102,8 +102,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,0
- PRODUCTVERSION 1,0,0,0
+ FILEVERSION 1,1,0,0
+ PRODUCTVERSION 1,1,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -120,12 +120,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "dacci.org"
             VALUE "FileDescription", "NTP クライアント アプリケーション"
-            VALUE "FileVersion", "1.0.0.0"
+            VALUE "FileVersion", "1.1.0.0"
             VALUE "InternalName", "NtpClient.exe"
             VALUE "LegalCopyright", "Copyright (c) 2013 dacci.org"
             VALUE "OriginalFilename", "NtpClient.exe"
             VALUE "ProductName", "NTP クライアント"
-            VALUE "ProductVersion", "1.0.0.0"
+            VALUE "ProductVersion", "1.1.0.0"
         END
     END
     BLOCK "VarFileInfo"
