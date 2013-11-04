@@ -23,7 +23,10 @@
 #include "misc/ntp_util.h"
 
 void ConvertNtpTimestamp(const NTP_TIMESTAMP& timestamp, tm* time) {
-  uint32_t temp = timestamp.seconds;
+  TIME_ZONE_INFORMATION timezone;
+  ::GetTimeZoneInformation(&timezone);
+
+  uint32_t temp = timestamp.seconds - timezone.Bias * 60;
 
   time->tm_sec = temp % 60;
   temp /= 60;
@@ -31,7 +34,7 @@ void ConvertNtpTimestamp(const NTP_TIMESTAMP& timestamp, tm* time) {
   time->tm_min = temp % 60;
   temp /= 60;
 
-  time->tm_hour = temp % 24 + 9;
+  time->tm_hour = temp % 24;
   temp /= 24;
 
   time->tm_yday = temp % 365;
@@ -88,7 +91,7 @@ void FormatNtpTimestamp(const NTP_TIMESTAMP& timestamp, CString* result) {
                  days[time.tm_wday],
                  time.tm_mday,
                  months[time.tm_mon],
-                 time.tm_year,
+                 time.tm_year + 1900,
                  time.tm_hour,
                  time.tm_min,
                  time.tm_sec,
@@ -108,4 +111,39 @@ void FormatNtpReferenceId(int stratum, const uint8_t* ref_id, CString* result) {
       result->AppendFormat(L"%u", ref_id[i]);
     }
   }
+}
+
+void SystemTimeToNtpTimestamp(const SYSTEMTIME& system_time,
+                              NTP_TIMESTAMP* timestamp) {
+  int month_days[] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+  int leap = system_time.wYear - 1900;
+  if (leap > 0) {
+    leap = (leap - 1) / 4 - (leap - 1) / 100 + (leap + 299) / 400;
+
+    if (system_time.wMonth < 3)
+      --leap;
+  } else {
+    leap = 0;
+  }
+
+  int64_t seconds = system_time.wYear - 1900;
+  seconds *= 365;
+
+  for (int m = 0; m < system_time.wMonth; ++m)
+    seconds += month_days[m];
+  seconds += system_time.wDay - 1;
+  seconds += leap;
+
+  seconds *= 24;
+  seconds += system_time.wHour;
+
+  seconds *= 60;
+  seconds += system_time.wMinute;
+
+  seconds *= 60;
+  seconds += system_time.wSecond;
+
+  timestamp->seconds = seconds;
+  timestamp->fraction = system_time.wMilliseconds * 4294967.295;
 }

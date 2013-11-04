@@ -24,7 +24,7 @@
 
 #include <ws2tcpip.h>
 
-#include "misc/ntp.h"
+#include "misc/ntp_util.h"
 #include "ui/main_dialog.h"
 
 CAppModule _Module;
@@ -95,10 +95,20 @@ void CALLBACK SimpleCallback(PTP_CALLBACK_INSTANCE instance, PVOID context) {
     if (sock == INVALID_SOCKET)
       break;
 
+    SYSTEMTIME system_time;
+    ::GetSystemTime(&system_time);
+
     NTP_PACKET request = {};
     request.leap = NTP_LEAP_UNKNOWN;
     request.version = 3;
     request.mode = NTP_MODE_CLIENT;
+
+    ::SystemTimeToNtpTimestamp(system_time, &request.transmit_timestamp);
+    request.transmit_timestamp.seconds =
+        ::_byteswap_ulong(request.transmit_timestamp.seconds);
+    request.transmit_timestamp.fraction =
+        ::_byteswap_ulong(request.transmit_timestamp.fraction);
+
     error = ::send(sock, reinterpret_cast<char*>(&request), sizeof(request), 0);
     if (error <= 0) {
       error = ::WSAGetLastError();
