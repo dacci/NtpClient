@@ -118,14 +118,10 @@ void SystemTimeToNtpTimestamp(const SYSTEMTIME& system_time,
   int month_days[] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
   int leap = system_time.wYear - 1900;
-  if (leap > 0) {
+  if (leap > 0)
     leap = (leap - 1) / 4 - (leap - 1) / 100 + (leap + 299) / 400;
-
-    if (system_time.wMonth < 3)
-      --leap;
-  } else {
+  else
     leap = 0;
-  }
 
   int64_t seconds = system_time.wYear - 1900;
   seconds *= 365;
