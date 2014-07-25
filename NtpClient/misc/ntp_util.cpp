@@ -67,8 +67,10 @@ void ConvertNtpTimestamp(const NTP_TIMESTAMP& timestamp, tm* time) {
 
   int C = y / 100;
   int Y = y % 100;
-  int G = 5 * C + C / 4;
-  time->tm_wday = (time->tm_mday + 26 * (m + 1) / 10 + Y + Y / 4 + G + 6) % 7;
+  time->tm_wday = (5 * C + Y + Y / 4 + C / 4 + 26 * (m + 1) / 10 +
+                   time->tm_mday - 1) % 7;
+  if (time->tm_wday < 0)
+    time->tm_wday += 7;
 
   time->tm_isdst = 0;
 }
