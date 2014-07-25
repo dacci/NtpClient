@@ -46,9 +46,32 @@ BOOL MainDialog::OnInitDialog(CWindow focus, LPARAM init_param) {
   DoDataExchange(DDX_LOAD);
   DlgResize_Init(true);
 
+  CString ntp_server;
+  CRegKey key;
+  LSTATUS status = key.Open(
+      HKEY_LOCAL_MACHINE,
+      L"SYSTEM\\CurrentControlSet\\services\\W32Time\\Parameters",
+      KEY_QUERY_VALUE);
+  if (status == 0) {
+    ULONG length = 0;
+    key.QueryStringValue(L"NtpServer", nullptr, &length);
+    status = key.QueryStringValue(L"NtpServer", ntp_server.GetBuffer(length),
+                                  &length);
+    ntp_server.ReleaseBuffer(length);
+
+    if (status == 0) {
+      int index = ntp_server.ReverseFind(L',');
+      if (index > 0)
+        ntp_server.Delete(index, ntp_server.GetLength() - index);
+    }
+  }
+
+  if (status != 0)
+    ntp_server = L"time.windows.com";
+
   NetAddr_SetAllowType(address_,
                         NET_STRING_ANY_ADDRESS | NET_STRING_ANY_SERVICE);
-  address_.SetWindowText(L"time.windows.com");
+  address_.SetWindowText(ntp_server);
 
   result_.SetExtendedListViewStyle(LVS_EX_FULLROWSELECT);
   result_.AddColumn(L"Field", 0);
