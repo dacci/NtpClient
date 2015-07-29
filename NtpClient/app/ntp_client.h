@@ -27,7 +27,12 @@
 #include <atlstr.h>
 #include <atlwin.h>
 
+#pragma warning(push)
+#pragma warning(disable: 4302 4838)
+
 #include <atlapp.h>
+
+#pragma warning(pop)
 
 #include <winsock2.h>
 #include <ws2ipdef.h>

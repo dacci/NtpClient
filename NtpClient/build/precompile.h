@@ -30,11 +30,16 @@
 #include <atlstr.h>
 #include <atlwin.h>
 
+#pragma warning(push)
+#pragma warning(disable: 4302 4838)
+
 #include <atlapp.h>
 #include <atlcrack.h>
 #include <atlctrls.h>
 #include <atlddx.h>
 #include <atldlgs.h>
 #include <atlframe.h>
+
+#pragma warning(pop)
 
 #endif  // NTPCLIENT_BUILD_PRECOMPILE_H_
