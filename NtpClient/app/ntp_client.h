@@ -40,13 +40,21 @@
 #include <iphlpapi.h>
 #include <shellapi.h>
 
+#include "misc/ntp.h"
+
 struct REQUEST_INFO : NET_ADDRESS_INFO, NC_ADDRESS {
-  REQUEST_INFO() : NET_ADDRESS_INFO(), NC_ADDRESS(), window(), event() {
+  REQUEST_INFO()
+      : NET_ADDRESS_INFO(),
+        NC_ADDRESS(),
+        window(),
+        event(),
+        mode(NTP_MODE_CLIENT) {
     pAddrInfo = this;
   }
 
   CWindow* window;
   HANDLE event;
+  NTP_MODE mode;
 };
 
 extern CAppModule _Module;

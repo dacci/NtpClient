@@ -26,7 +26,9 @@
 #include "misc/ntp_util.h"
 
 MainDialog::MainDialog()
-    : event_(::CreateEvent(NULL, TRUE, FALSE, NULL)), response_() {
+    : event_(::CreateEvent(NULL, TRUE, FALSE, NULL)),
+      response_(),
+      mode_(NTP_MODE_CLIENT) {
 }
 
 MainDialog::~MainDialog() {
@@ -103,6 +105,27 @@ void MainDialog::OnDestroy() {
   ::PostQuitMessage(0);
 }
 
+LRESULT MainDialog::OnOkDropDown(NMHDR* header) {
+  NMBCDROPDOWN* dropdown = reinterpret_cast<NMBCDROPDOWN*>(header);
+
+  CMenu menu;
+  if (!menu.CreatePopupMenu())
+    return 0;
+
+  menu.AppendMenu(MF_STRING, ID_FILE_MRU_FILE2, L"Symmetric Active");
+  menu.AppendMenu(MF_STRING, ID_FILE_MRU_FILE3, L"Symmetric Passive");
+  menu.AppendMenu(MF_STRING, ID_FILE_MRU_FILE4, L"Client");
+  menu.AppendMenu(MF_STRING, ID_FILE_MRU_FILE5, L"Server");
+  menu.AppendMenu(MF_STRING, ID_FILE_MRU_FILE6, L"Broadcast");
+  menu.CheckMenuRadioItem(0, 4, mode_ - 1, MF_BYPOSITION);
+
+  POINT point = { 0, dropdown->rcButton.bottom };
+  ::ClientToScreen(header->hwndFrom, &point);
+  menu.TrackPopupMenu(TPM_RIGHTBUTTON, point.x, point.y, m_hWnd);
+
+  return 0;
+}
+
 LRESULT MainDialog::OnResultDoubleClicked(NMHDR* header) {
   NMITEMACTIVATE* notify = reinterpret_cast<NMITEMACTIVATE*>(header);
 
@@ -113,6 +136,11 @@ LRESULT MainDialog::OnResultDoubleClicked(NMHDR* header) {
   }
 
   return 0;
+}
+
+void MainDialog::OnChangeMode(UINT notify_code, int id, CWindow control) {
+  mode_ = static_cast<NTP_MODE>(id - ID_FILE_MRU_FIRST);
+  OnOK(notify_code, id, control);
 }
 
 void MainDialog::OnOK(UINT notify_code, int id, CWindow control) {
@@ -127,6 +155,7 @@ void MainDialog::OnOK(UINT notify_code, int id, CWindow control) {
 
   request_info->window = this;
   request_info->event = event_;
+  request_info->mode = mode_;
 
   if (::TrySubmitThreadpoolCallback(SimpleCallback, request_info, NULL))
     EnableWindow(FALSE);

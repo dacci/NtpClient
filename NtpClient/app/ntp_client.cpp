@@ -101,7 +101,7 @@ void CALLBACK SimpleCallback(PTP_CALLBACK_INSTANCE instance, PVOID context) {
     NTP_PACKET request = {};
     request.leap = NTP_LEAP_UNKNOWN;
     request.version = 3;
-    request.mode = NTP_MODE_CLIENT;
+    request.mode = request_info->mode;
 
     ::SystemTimeToNtpTimestamp(system_time, &request.transmit_timestamp);
     request.transmit_timestamp.seconds =

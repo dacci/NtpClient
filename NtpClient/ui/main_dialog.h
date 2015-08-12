@@ -56,8 +56,10 @@ class MainDialog
     MSG_WM_INITDIALOG(OnInitDialog)
     MSG_WM_DESTROY(OnDestroy)
 
+    NOTIFY_HANDLER_EX(IDOK, BCN_DROPDOWN, OnOkDropDown)
     NOTIFY_HANDLER_EX(IDC_RESULT, NM_DBLCLK, OnResultDoubleClicked)
 
+    COMMAND_RANGE_HANDLER_EX(ID_FILE_MRU_FILE2, ID_FILE_MRU_FILE6, OnChangeMode)
     COMMAND_ID_HANDLER_EX(IDOK, OnOK)
     COMMAND_ID_HANDLER_EX(IDYES, OnYes)
     COMMAND_ID_HANDLER_EX(IDNO, OnNo)
@@ -78,14 +80,16 @@ class MainDialog
     DLGRESIZE_CONTROL(IDC_RESULT, DLSZ_SIZE_X | DLSZ_SIZE_Y)
   END_DLGRESIZE_MAP()
 
-  virtual BOOL PreTranslateMessage(MSG* message);
+  BOOL PreTranslateMessage(MSG* message) override;
 
  private:
   BOOL OnInitDialog(CWindow focus, LPARAM init_param);
   void OnDestroy();
 
+  LRESULT OnOkDropDown(NMHDR* header);
   LRESULT OnResultDoubleClicked(NMHDR* header);
 
+  void OnChangeMode(UINT notify_code, int id, CWindow control);
   void OnOK(UINT notify_code, int id, CWindow control);
   void OnYes(UINT notify_code, int id, void* context);
   void OnNo(UINT notify_code, int id, void* context);
@@ -95,6 +99,7 @@ class MainDialog
   CWindow address_;
   CButton ok_;
   CListViewCtrl result_;
+  NTP_MODE mode_;
 
   NTP_PACKET* response_;
 };

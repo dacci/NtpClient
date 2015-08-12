@@ -65,8 +65,8 @@ CAPTION "NTP クライアント"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "NTP サーバー (&S):",IDC_STATIC,7,10,56,8
-    CONTROL         "",IDC_ADDRESS,"msctls_netaddress",ES_AUTOHSCROLL | WS_TABSTOP,70,8,127,12,WS_EX_CLIENTEDGE
-    DEFPUSHBUTTON   "送信",IDOK,204,7,34,14
+    CONTROL         "",IDC_ADDRESS,"msctls_netaddress",ES_AUTOHSCROLL | WS_TABSTOP,70,8,110,12,WS_EX_CLIENTEDGE
+    CONTROL         "送信",IDOK,"Button",BS_DEFSPLITBUTTON | WS_TABSTOP,187,7,51,14
     CONTROL         "",IDC_RESULT,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,28,231,153,WS_EX_CLIENTEDGE
 END
 
@@ -85,8 +85,8 @@ BEGIN
         RIGHTMARGIN, 238
         VERTGUIDE, 63
         VERTGUIDE, 70
-        VERTGUIDE, 197
-        VERTGUIDE, 204
+        VERTGUIDE, 180
+        VERTGUIDE, 187
         TOPMARGIN, 7
         BOTTOMMARGIN, 181
         HORZGUIDE, 21
@@ -102,8 +102,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,1,0
- PRODUCTVERSION 1,1,1,0
+ FILEVERSION 1,2,0,0
+ PRODUCTVERSION 1,2,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -120,18 +120,29 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "dacci.org"
             VALUE "FileDescription", "NTP クライアント アプリケーション"
-            VALUE "FileVersion", "1.1.1.0"
+            VALUE "FileVersion", "1.2.0.0"
             VALUE "InternalName", "NtpClient.exe"
-            VALUE "LegalCopyright", "Copyright (c) 2013 dacci.org"
+            VALUE "LegalCopyright", "Copyright (c) 2015 dacci.org"
             VALUE "OriginalFilename", "NtpClient.exe"
             VALUE "ProductName", "NTP クライアント"
-            VALUE "ProductVersion", "1.1.1.0"
+            VALUE "ProductVersion", "1.2.0.0"
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
         VALUE "Translation", 0x411, 1200
     END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_MAIN AFX_DIALOG_LAYOUT
+BEGIN
+    0
 END
 
 #endif    // 日本語 (日本) resources
